@@ -60,7 +60,8 @@ func GetZhiShuXiaJiJinJianYaoXinXi(zhiShuDaiMa string) []zhiShuXiaJiJinJianYaoXi
 
 		fundList := item.(map[string]interface{})["funds"].([]interface{})
 		for _, fund := range fundList {
-			jiSuanJianYaoXinXi(fundTypeInt, fund, &wg, data)
+			wg.Add(1)
+			go jiSuanJianYaoXinXi(fundTypeInt, fund, &wg, data)
 		}
 	}
 	wg.Wait()
@@ -78,7 +79,6 @@ func GetZhiShuXiaJiJinJianYaoXinXi(zhiShuDaiMa string) []zhiShuXiaJiJinJianYaoXi
 }
 
 func jiSuanJianYaoXinXi(fundType int, fund interface{}, wg *sync.WaitGroup, dataChannel chan zhiShuXiaJiJinJianYaoXinXi) {
-	wg.Add(1)
 	defer wg.Done()
 	var jiJinJianYaoXinXi zhiShuXiaJiJinJianYaoXinXi
 	fundInfo := fund.(map[string]interface{})
