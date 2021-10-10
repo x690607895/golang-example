@@ -37,7 +37,7 @@ type zuiDaHuiCheShuJu struct {
 	kaiShiRiQi time.Time //开始时间
 }
 
-func GetZhiShuXiaJiJinJianYaoXinXi(zhiShuDaiMa string) []zhiShuXiaJiJinJianYaoXinXi {
+func GetZhiShuXiaJiJinJianYaoXinXi(zhiShuDaiMa string) map[string]zhiShuXiaJiJinJianYaoXinXi {
 	wg := sync.WaitGroup{}
 	data := make(chan zhiShuXiaJiJinJianYaoXinXi, 100)
 	url := "https://danjuanapp.com/djapi/fundx/base/index/traces"
@@ -48,7 +48,7 @@ func GetZhiShuXiaJiJinJianYaoXinXi(zhiShuDaiMa string) []zhiShuXiaJiJinJianYaoXi
 	err := json.Unmarshal(respStr, &result)
 	checkErr(err)
 	items := result["data"].(map[string]interface{})["items"].([]interface{})
-	var result2 []zhiShuXiaJiJinJianYaoXinXi
+	result2 := make(map[string]zhiShuXiaJiJinJianYaoXinXi)
 	for _, item := range items {
 		fundTypeStr := item.(map[string]interface{})["fund_type"].(string)
 		fundTypeInt := 0
@@ -72,8 +72,7 @@ func GetZhiShuXiaJiJinJianYaoXinXi(zhiShuDaiMa string) []zhiShuXiaJiJinJianYaoXi
 		if !ok {
 			break
 		}
-		log.Println(jiJinJianYaoXinXi.string())
-		result2 = append(result2, jiJinJianYaoXinXi)
+		result2[jiJinJianYaoXinXi.FundCode] = jiJinJianYaoXinXi
 	}
 	return result2
 }
@@ -107,7 +106,7 @@ func jiSuanJianYaoXinXi(fundType int, fund interface{}, wg *sync.WaitGroup, data
 	dataChannel <- jiJinJianYaoXinXi
 }
 
-func (this *zhiShuXiaJiJinJianYaoXinXi) string() string {
+func (this *zhiShuXiaJiJinJianYaoXinXi) String() string {
 	var result string
 	result += fmt.Sprintf("当前基金名称：%s，", this.FundName)
 	result += fmt.Sprintf("当前基金代码：%s，", this.FundCode)

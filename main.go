@@ -4,6 +4,7 @@ package main
 import (
 	"fund"
 	"log"
+	"sort"
 	"strconv"
 	"time"
 )
@@ -23,8 +24,23 @@ type RespData struct {
 func main() {
 	zhiShuJiBenXinXi := fund.HuoQuZhiShuJiBenXinXiShuJu("SH000905")
 	log.Print(zhiShuJiBenXinXi.String())
-	fund.GetZhiShuXiaJiJinJianYaoXinXi("SH000905")
-	// zuiDaHuiCheFunc()
+	result := fund.GetZhiShuXiaJiJinJianYaoXinXi("SH000905")
+	// 最大回撤前5
+	log.Println("最大回撤前5：")
+	drawdownSortData := fund.NewPaiXuShuJuShuZuByDrawdown(&result)
+	sort.Sort(drawdownSortData)
+	drawdownSortData[:5].PrintLn(result)
+	// 最小误差前5（被动型指数）
+	log.Println("最小误差前5：")
+	trackErrorSortData := fund.NewPaiXuShuJuShuZuByTrackError(&result)
+	sort.Sort(trackErrorSortData)
+	trackErrorSortData[:5].PrintLn(result)
+	// 超额收益前5（主动型指数）
+	// 由于这里是从低到高排序，这里需要取倒数5个
+	log.Println("超额收益前5：")
+	excessEarningsSortData := fund.NewPaiXuShuJuShuZuByExcessEarnings(&result)
+	sort.Sort(excessEarningsSortData)
+	excessEarningsSortData[len(excessEarningsSortData)-5:].PrintLn(result)
 }
 
 func zuiDaHuiCheFunc() {
